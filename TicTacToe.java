@@ -13,7 +13,8 @@ public class TicTacToe {
     }
     
     public static void show(char[][] board, String name, int depth, int round, int[] move, int eval) {
-        System.out.println(name + " vs AI-" + depth + "\n");
+        System.out.println("TIC TAC TOE\n");
+        System.out.println(name + " vs AI-" + depth);
         System.out.println("Move " + round);
         System.out.println("Winning: " + (eval==2 ? " " : (eval==1 ? "X" : "O")));
         System.out.println("Last Played: " + Arrays.toString(new int[] {move[0]+1, move[1]+1}) + "\n");
@@ -45,7 +46,7 @@ public class TicTacToe {
                     bestX = i;
                     bestY = a;
                 }
-                else if (tempResult == result && Math.random() > diff/9) {
+                else if (tempResult == result && Math.random() > (diff/9)) {
                     result = tempResult;
                     bestX = i;
                     bestY = a;
@@ -88,62 +89,78 @@ public class TicTacToe {
     }
     
     public static void main(String[] args) {
-        Scanner input = new Scanner(System.in);
-
-        clear(100);
-
-        System.out.print("Name: ");
-        String name = input.nextLine();
-        clear(100);
-
-        System.out.print("Board Dimensions - Rows: ");
-        int rows = input.nextInt();
-        
-        System.out.print("Board Dimensions - Columns: ");
-        int cols = input.nextInt();
-        clear(100);
-        
-        System.out.print("Difficuilty (0-9): ");
-        int diff = input.nextInt()%10;
-        clear(100);
-        
-        char[][] board = new char[rows][cols];
-        for (char[] row: board) {
-            Arrays.fill(row, '*');
-        }
-        
-        int status = 0;
-        int round  = 0;
-        int eval   = 2;
-        int[] move = {-1, -1};
-        while (true) {
-            round += 1;
-            
+        String play = "y";
+        int win  = 0;
+        int lose = 0;
+        int tie  = 0;
+        while (!"n".equals(play)) {
+            Scanner input = new Scanner(System.in);
             clear(100);
-            show(board, name, diff, round, move, eval);
-            
-            System.out.print("\nRow: ");
-            move[0] = Math.abs(input.nextInt() - 1)%rows;
-            
-            System.out.print("Column: ");
-            move[1] = Math.abs(input.nextInt() - 1)%cols;
 
-            play(board, move, 'X');
-            status = check(board);
+            System.out.print("Name: ");
+            String name = input.nextLine();
+            clear(100);
+
+            System.out.print("Board Dimensions - Rows: ");
+            int rows = input.nextInt();
+
+            System.out.print("Board Dimensions - Columns: ");
+            int cols = input.nextInt();
+            clear(100);
+
+            System.out.print("Difficuilty (0-9): ");
+            int diff = Math.min(input.nextInt(), 9);
+            clear(100);
+
+            char[][] board = new char[rows][cols];
+            for (char[] row: board) {
+                Arrays.fill(row, '*');
+            }
+
+            int status = 0;
+            int round  = 0;
+            int eval   = 2;
+            int[] move = {-1, -1};
+            while (true) {
+                round += 1;
+
+                clear(100);
+                show(board, name, diff, round, move, eval);
+
+                System.out.print("\nRow: ");
+                move[0] = Math.abs(input.nextInt() - 1)%rows;
+
+                System.out.print("Column: ");
+                move[1] = Math.abs(input.nextInt() - 1)%cols;
+
+                play(board, move, 'X');
+                status = check(board);
+
+                if (status != 0) {break;}
+
+                int[] preds = predict(board, 'O', diff);
+                play(board, new int[] {preds[1], preds[2]}, 'O');
+                status = check(board);
+
+                eval = preds[0];
+
+                if (status != 0) {break;}
+            }
+            clear(100);
+            String winner = (status==2 ? "Nobody" : (status==1 ? name : "Computer"));
+            System.out.println((status==2 ? "Tie..." : (status==1 ? "Congratulations!" : "You Lost...")) + "\n");
+            System.out.println(winner + " Won!");
             
-            if (status != 0) {break;}
+            win  += (status==1 ? 1 : 0);
+            lose += (status==-1 ? 1 : 0);
+            tie  += (status==2 ? 1 : 0);
             
-            int[] preds = predict(board, 'O', diff);
-            play(board, new int[] {preds[1], preds[2]}, 'O');
-            status = check(board);
+            System.out.println("\n\nWins   : " + win);
+            System.out.println("Losses : " + lose);
+            System.out.println("Ties   : " + tie);
             
-            eval = preds[0];
-            
-            if (status != 0) {break;}
+            System.out.println("\nContinue? (y|n): ");
+            play = input.nextLine();
         }
-        clear(100);
-        String winner = (status==2 ? "Nobody" : (status==1 ? name : "Computer"));
-        System.out.println((status==2 ? "Tie..." : (status==1 ? "Congratulations!" : "You Lost...")) + "\n");
-        System.out.println(winner + " Won!");
     }
 }
