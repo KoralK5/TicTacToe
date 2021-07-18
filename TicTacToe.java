@@ -22,18 +22,46 @@ public class TicTacToe {
         }
     }
 
-    public static void predict(char[][] board, int[] move, int depth, int rows, int cols) {
-        Random random = new Random();
-        if (depth == 0) {
-            boolean valid = false;
-            while (!valid) {
-                move[0] = random.nextInt(rows);
-                move[1] = random.nextInt(cols);
-                valid   = (board[move[0]][move[1]] == '*');
+    public static boolean tie(char[][] board) {
+        for (char[] row : board) {
+            for (char col : row) {
+                if (col == '*') {
+                    return false;
+                }
             }
         }
-    }
+        return true;
+    }    
     
+    public static int predict(char[][] board, char player, int[] move, int depth, int rows, int cols) {
+        int tempStatus = check(board, player, move[0], move[1]);
+        if (tempStatus != 0 || tie(board)) {
+            return tempStatus;
+        }
+
+        int result = (player=='X' ? -1 : 1);
+
+        for (int i = 0; i < rows; i++) {
+            for (int a = 0; a < cols; a++) {
+                if (board[i][a] != '*')
+                    continue;
+                
+                move[0] = i;
+                move[1] = a;
+                board[i][a] = player;
+                
+                int tempResult = predict(board, (player == 'X' ? 'O' : 'X'), move, depth, rows, cols);
+                
+                board[i][a] = '*';
+                
+                if (((player == 'X') == tempResult > result) || (!(player == 'X') && tempResult < result)) {
+                    result = tempResult;
+                }
+            }
+        return result;
+        }
+    }
+
     public static void play(char[][] board, int[] move, char player) {
         board[move[0]][move[1]] = player;
     }
@@ -96,11 +124,13 @@ public class TicTacToe {
             
             if (status != 0) {break;}
             
-            predict(board, move, depth, rows, cols);
+            predict(board, 'O', move, depth, rows, cols);
             play(board, move, 'O');
             status = check(board, 'O', move[0], move[1]);
             
             if (status != 0) {break;}
+            
+            if (tie(board)) {break;}
         }
         clear(100);
         String winner = (status==0 ? "Nobody" : (status==1 ? name : "Computer"));
