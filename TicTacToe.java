@@ -10,7 +10,7 @@ import java.util.Random;
 
 public class TicTacToe {
     public static void clear(int size) {
-        for (int i = 0; i < size; i++) {System.out.println();}
+        for (int i=0; i<size; i++) {System.out.println();}
     }
     
     public static void show(char[][] board, String name, int depth, int round, int[] move) {
@@ -25,8 +25,12 @@ public class TicTacToe {
     public static void predict(char[][] board, int[] move, int depth, int rows, int cols) {
         Random random = new Random();
         if (depth == 0) {
-            move[0] = random.nextInt(rows);
-            move[1] = random.nextInt(cols);
+            boolean valid = false;
+            while (!valid) {
+                move[0] = random.nextInt(rows);
+                move[1] = random.nextInt(cols);
+                valid = (board[move[0]][move[1]] == '*');
+            }
         }
     }
     
@@ -37,7 +41,7 @@ public class TicTacToe {
     public static int check(char[][] board, char player, int x, int y) {
         int boardLen = board.length;
         int col = 0; int row = 0; int ldiag = 0; int rdiag = 0;
-        for (int i=0;i<boardLen;i++) {
+        for (int i=0; i<boardLen; i++) {
             col   += (board[x][i] == player) ? 1 : 0;
             row   += (board[i][y] == player) ? 1 : 0;
             ldiag += (board[i][i] == player) ? 1 : 0;
@@ -57,7 +61,6 @@ public class TicTacToe {
 
         System.out.print("Board Dimensions - Rows: ");
         int rows = input.nextInt();
-        clear(100);
 
         System.out.print("Board Dimensions - Columns: ");
         int cols = input.nextInt();
@@ -91,20 +94,16 @@ public class TicTacToe {
             play(board, move, 'X');
             status = check(board, 'X', move[0], move[1]);
             
-            if (status != 0) {
-                break;
-            }
+            if (status != 0) {break;}
             
             predict(board, move, depth, rows, cols);
             play(board, move, 'O');
             status = check(board, 'O', move[0], move[1]);
             
-            if (status != 0) {
-                break;
-            }
+            if (status != 0) {break;}
         }
         clear(100);
         String winner = (status==0 ? "Nobody" : (status==1 ? name : "Computer"));
-        System.out.print(winner + " Wins!\n");
+        System.out.println(winner + " Wins!");
     }
 }
