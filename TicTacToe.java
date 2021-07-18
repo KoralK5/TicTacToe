@@ -155,7 +155,7 @@ public class TicTacToe {
             lose += (status==-1 ? 1 : 0);
             tie  += (status==2 ? 1 : 0);
             
-            System.out.println("\n\nWins   : " + win);
+            System.out.println("\nWins   : " + win);
             System.out.println("Losses : " + lose);
             System.out.println("Ties   : " + tie);
             
