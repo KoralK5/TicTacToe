@@ -89,12 +89,12 @@ public class TicTacToe {
     }
     
     public static void main(String[] args) {
+        Scanner input = new Scanner(System.in);
         String play = "y";
         int win  = 0;
         int lose = 0;
         int tie  = 0;
         while (!"n".equals(play)) {
-            Scanner input = new Scanner(System.in);
             clear(100);
 
             System.out.print("Name: ");
@@ -151,15 +151,16 @@ public class TicTacToe {
             System.out.println((status==2 ? "Tie..." : (status==1 ? "Congratulations!" : "You Lost...")) + "\n");
             System.out.println(winner + " Won!");
             
-            win  += (status==1 ? 1 : 0);
+            win  += (status==1  ? 1 : 0);
             lose += (status==-1 ? 1 : 0);
-            tie  += (status==2 ? 1 : 0);
+            tie  += (status==2  ? 1 : 0);
             
             System.out.println("\nWins   : " + win);
             System.out.println("Losses : " + lose);
             System.out.println("Ties   : " + tie);
             
-            System.out.println("\nContinue? (y|n): ");
+            input.nextLine();
+            System.out.print("\nContinue? (y|n): ");
             play = input.nextLine();
         }
     }
