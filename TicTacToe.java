@@ -29,7 +29,7 @@ public class TicTacToe {
             while (!valid) {
                 move[0] = random.nextInt(rows);
                 move[1] = random.nextInt(cols);
-                valid = (board[move[0]][move[1]] == '*');
+                valid   = (board[move[0]][move[1]] == '*');
             }
         }
     }
@@ -77,7 +77,7 @@ public class TicTacToe {
         }
         
         int status = 0;
-        int round = 0;
+        int round  = 0;
         int[] move = {-1, -1};
         while (true) {
             round += 1;
