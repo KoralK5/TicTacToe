@@ -13,10 +13,11 @@ public class TicTacToe {
         for (int i=0; i<size; i++) {System.out.println();}
     }
     
-    public static void show(char[][] board, String name, int depth, int round, int[] move) {
+    public static void show(char[][] board, String name, int depth, int round, int[] move, int eval) {
         System.out.println(name + " vs AI-" + depth + "\n");
         System.out.println("Round " + round);
-        System.out.println("Last Played: " + Arrays.toString(move) + "\n");
+        System.out.println("Winning: " + (eval==2 ? " " : (eval==1 ? "X" : "O")));
+        System.out.println("Last Played: " + Arrays.toString(new int[] {move[0]+1, move[1]+1}) + "\n");
         for (char[] row : board) {
             System.out.println(Arrays.toString(row));
         }
@@ -33,55 +34,74 @@ public class TicTacToe {
         return true;
     }    
     
-    public static int predict(char[][] board, char player, int[] move, int depth, int startDepth, int rows, int cols) {
-        int tempStatus = check(board, player, move[0], move[1]);
-        if (tempStatus != 0 || tie(board)) {
-            return tempStatus;
+    public static int[] predict(char[][] board, char player, int diff) {
+        int tempStatus = check(board);
+        if (tempStatus != 0) {
+            return new int[] {tempStatus, -1, -1};
         }
-
-        int result = (player=='X' ? -1 : 1);
         
-        if (startDepth != depth) {
-            for (int i = 0; i < rows; i++) {
-                for (int a = 0; a < cols; a++) {
-                    if (board[i][a] != '*')
-                        continue;
+        int bestX = -1, bestY = -1;
+        int result = (player=='X' ? -1 : 1);
 
-                    move[0] = i;
-                    move[1] = a;
-                    board[i][a] = player;
+        for (int i = 0; i < board.length; i++) {
+            for (int a = 0; a < board[i].length; a++) {
+                if (board[i][a] != '*')
+                    continue;
 
-                    int tempResult = predict(board, (player == 'X' ? 'O' : 'X'), move, depth, startDepth+1, rows, cols);
+                board[i][a] = player;
+                int tempResult = predict(board, (player == 'X' ? 'O' : 'X'), diff)[0];
+                board[i][a] = '*';
 
-                    board[i][a] = '*';
-
-                    if (((player == 'X') == tempResult > result) || (!(player == 'X') && tempResult < result)) {
-                        result = tempResult;
-                    }
+                if (((player == 'X') == tempResult > result) || (!(player == 'X') && tempResult < result)) {
+                    result = tempResult;
+                    bestX = i;
+                    bestY = a;
+                }
+                else if (tempResult == result && Math.random() > diff/10) {
+                    result = tempResult;
+                    bestX = i;
+                    bestY = a;
                 }
             }
         }
-        return result;
+        return new int[] {result, bestX, bestY};
     }
 
     public static void play(char[][] board, int[] move, char player) {
         board[move[0]][move[1]] = player;
     }
 
-    public static int check(char[][] board, char player, int x, int y) {
-        int boardLen = board.length;
-        int col = 0; int row = 0; int ldiag = 0; int rdiag = 0;
-        for (int i=0; i<boardLen; i++) {
-            col   += (board[x][i] == player) ? 1 : 0;
-            row   += (board[i][y] == player) ? 1 : 0;
-            ldiag += (board[i][i] == player) ? 1 : 0;
-            rdiag += (board[i][boardLen-i-1] == player) ? 1 : 0;
+    public static int check(char[][] board) {
+        boolean full = true;
+        for (int i=0; i<board.length; i++) {
+            for (int y=0; y<board[i].length; y++) {
+                try{ if ((board[i][y] == board[i][y-1]) && (board[i][y] == board[i][y+1]) && (board[i][y] != '*')) {
+                    return (board[i][y] == 'X' ? 1 : -1);
+                }} catch (Exception e){}
+                
+                try{ if ((board[i][y] == board[i-1][y]) && (board[i][y] == board[i+1][y]) && (board[i][y] != '*')) {
+                    return (board[i][y] == 'X' ? 1 : -1);
+                }} catch (Exception e){}
+                
+                try{ if ((board[i][y] == board[i-1][y-1]) && (board[i][y] == board[i+1][y+1]) && (board[i][y] != '*')) {
+                    return (board[i][y] == 'X' ? 1 : -1);
+                }} catch (Exception e){}
+                
+                try{ if ((board[i][y] == board[i+1][y-1]) && (board[i][y] == board[i-1][y+1]) && (board[i][y] != '*')) {
+                    return (board[i][y] == 'X' ? 1 : -1);
+                }} catch (Exception e){}
+                
+                if (board[i][y] == '*') {
+                    full = false;
+                }
+            } 
         }
-        return !((row==boardLen) || (col==boardLen) || (ldiag==boardLen) || (rdiag==boardLen)) ? 0 : (player=='X' ? 1 : -1);
+        return (full ? 2 : 0);
     }
     
     public static void main(String[] args) {
         Scanner input = new Scanner(System.in);
+        Random random = new Random();
 
         clear(100);
 
@@ -91,14 +111,13 @@ public class TicTacToe {
 
         System.out.print("Board Dimensions - Rows: ");
         int rows = input.nextInt();
-
+        
         System.out.print("Board Dimensions - Columns: ");
         int cols = input.nextInt();
         clear(100);
         
-        System.out.println("The computer can see x moves ahead");
-        System.out.print("AI Depth: ");
-        int depth = input.nextInt();
+        System.out.print("Difficuilty (0-9): ");
+        int diff = input.nextInt()%10;
         clear(100);
         
         char[][] board = new char[rows][cols];
@@ -108,12 +127,13 @@ public class TicTacToe {
         
         int status = 0;
         int round  = 0;
+        int eval   = 2;
         int[] move = {-1, -1};
         while (true) {
             round += 1;
             
             clear(100);
-            show(board, name, depth, round, move);
+            show(board, name, diff, round, move, eval);
             
             System.out.print("\nRow: ");
             move[0] = Math.abs(input.nextInt() - 1)%rows;
@@ -122,20 +142,21 @@ public class TicTacToe {
             move[1] = Math.abs(input.nextInt() - 1)%cols;
 
             play(board, move, 'X');
-            status = check(board, 'X', move[0], move[1]);
+            status = check(board);
             
             if (status != 0) {break;}
             
-            predict(board, 'O', move, depth, 0, rows, cols);
-            play(board, move, 'O');
-            status = check(board, 'O', move[0], move[1]);
+            int[] preds = predict(board, 'O', diff);
+            play(board, new int[] {preds[1], preds[2]}, 'O');
+            status = check(board);
+            
+            eval = preds[0];
             
             if (status != 0) {break;}
-            
-            if (tie(board)) {break;}
         }
         clear(100);
-        String winner = (status==0 ? "Nobody" : (status==1 ? name : "Computer"));
-        System.out.println(winner + " Wins!");
+        String winner = (status==2 ? "Nobody" : (status==1 ? name : "Computer"));
+        System.out.println((status==2 ? "Tie..." : (status==1 ? "Congratulations!" : "You Lost...")) + "\n");
+        System.out.println(winner + " Won!");
     }
 }
