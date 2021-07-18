@@ -33,33 +33,35 @@ public class TicTacToe {
         return true;
     }    
     
-    public static int predict(char[][] board, char player, int[] move, int depth, int rows, int cols) {
+    public static int predict(char[][] board, char player, int[] move, int depth, int startDepth, int rows, int cols) {
         int tempStatus = check(board, player, move[0], move[1]);
         if (tempStatus != 0 || tie(board)) {
             return tempStatus;
         }
 
         int result = (player=='X' ? -1 : 1);
+        
+        if (startDepth != depth) {
+            for (int i = 0; i < rows; i++) {
+                for (int a = 0; a < cols; a++) {
+                    if (board[i][a] != '*')
+                        continue;
 
-        for (int i = 0; i < rows; i++) {
-            for (int a = 0; a < cols; a++) {
-                if (board[i][a] != '*')
-                    continue;
-                
-                move[0] = i;
-                move[1] = a;
-                board[i][a] = player;
-                
-                int tempResult = predict(board, (player == 'X' ? 'O' : 'X'), move, depth, rows, cols);
-                
-                board[i][a] = '*';
-                
-                if (((player == 'X') == tempResult > result) || (!(player == 'X') && tempResult < result)) {
-                    result = tempResult;
+                    move[0] = i;
+                    move[1] = a;
+                    board[i][a] = player;
+
+                    int tempResult = predict(board, (player == 'X' ? 'O' : 'X'), move, depth, startDepth+1, rows, cols);
+
+                    board[i][a] = '*';
+
+                    if (((player == 'X') == tempResult > result) || (!(player == 'X') && tempResult < result)) {
+                        result = tempResult;
+                    }
                 }
             }
-        return result;
         }
+        return result;
     }
 
     public static void play(char[][] board, int[] move, char player) {
@@ -124,7 +126,7 @@ public class TicTacToe {
             
             if (status != 0) {break;}
             
-            predict(board, 'O', move, depth, rows, cols);
+            predict(board, 'O', move, depth, 0, rows, cols);
             play(board, move, 'O');
             status = check(board, 'O', move[0], move[1]);
             
