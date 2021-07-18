@@ -1,7 +1,6 @@
 package tictactoe;
 import java.util.Scanner;
 import java.util.Arrays;
-import java.util.Random;
 
 /**
  *
@@ -101,7 +100,6 @@ public class TicTacToe {
     
     public static void main(String[] args) {
         Scanner input = new Scanner(System.in);
-        Random random = new Random();
 
         clear(100);
 
