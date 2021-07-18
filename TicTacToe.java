@@ -69,8 +69,9 @@ public class TicTacToe {
         clear(100);
         
         char[][] board = new char[rows][cols];
-        for (char[] row: board)
+        for (char[] row: board) {
             Arrays.fill(row, '*');
+        }
         
         int status = 0;
         int round = 0;
