@@ -14,7 +14,7 @@ public class TicTacToe {
     
     public static void show(char[][] board, String name, int depth, int round, int[] move, int eval) {
         System.out.println(name + " vs AI-" + depth + "\n");
-        System.out.println("Round " + round);
+        System.out.println("Move " + round);
         System.out.println("Winning: " + (eval==2 ? " " : (eval==1 ? "X" : "O")));
         System.out.println("Last Played: " + Arrays.toString(new int[] {move[0]+1, move[1]+1}) + "\n");
         for (char[] row : board) {
@@ -22,17 +22,6 @@ public class TicTacToe {
         }
     }
 
-    public static boolean tie(char[][] board) {
-        for (char[] row : board) {
-            for (char col : row) {
-                if (col == '*') {
-                    return false;
-                }
-            }
-        }
-        return true;
-    }    
-    
     public static int[] predict(char[][] board, char player, int diff) {
         int tempStatus = check(board);
         if (tempStatus != 0) {
