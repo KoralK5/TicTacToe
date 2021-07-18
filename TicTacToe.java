@@ -45,7 +45,7 @@ public class TicTacToe {
                     bestX = i;
                     bestY = a;
                 }
-                else if (tempResult == result && Math.random() > diff/10) {
+                else if (tempResult == result && Math.random() > diff/9) {
                     result = tempResult;
                     bestX = i;
                     bestY = a;
