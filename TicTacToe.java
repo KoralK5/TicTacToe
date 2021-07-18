@@ -82,10 +82,10 @@ public class TicTacToe {
             show(board, name, depth, round, move);
             
             System.out.print("\nRow: ");
-            move[0] = (input.nextInt() - 1)%rows;
+            move[0] = Math.abs(input.nextInt() - 1)%rows;
             
             System.out.print("Column: ");
-            move[1] = (input.nextInt() - 1)%cols;
+            move[1] = Math.abs(input.nextInt() - 1)%cols;
 
             play(board, move, 'X');
             status = check(board, 'X', move[0], move[1]);
@@ -95,7 +95,6 @@ public class TicTacToe {
             }
             
             predict(board, move, depth, rows, cols);
-            
             play(board, move, 'O');
             status = check(board, 'O', move[0], move[1]);
             
@@ -105,6 +104,6 @@ public class TicTacToe {
         }
         clear(100);
         String winner = (status==0 ? "Nobody" : (status==1 ? name : "Computer"));
-        System.out.print(winner + " Wins!");
+        System.out.print(winner + " Wins!\n");
     }
 }
